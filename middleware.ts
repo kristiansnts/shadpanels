@@ -4,18 +4,22 @@ import { isAuthenticatedFromRequest } from '@/lib/auth'
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const isAuth = isAuthenticatedFromRequest(request)
 
-  // Don't protect login page
-  if (pathname === '/admin/login') {
+  // Handle login page - redirect to admin if already authenticated
+  if (pathname === '/admin/login' || pathname === '/login') {
+    if (isAuth) {
+      // Redirect authenticated users to admin dashboard
+      const adminUrl = new URL('/admin', request.url)
+      return NextResponse.redirect(adminUrl)
+    }
     return NextResponse.next()
   }
 
   // Check if the request is for admin routes (except login)
   if (pathname.startsWith('/admin')) {
-    const isAuth = isAuthenticatedFromRequest(request)
-    
     if (!isAuth) {
-      // Redirect to login page
+      // Redirect unauthenticated users to login page
       const loginUrl = new URL('/admin/login', request.url)
       return NextResponse.redirect(loginUrl)
     }
@@ -27,6 +31,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/admin/:path*'
+    '/admin/:path*',
+    '/login'
   ]
 }
