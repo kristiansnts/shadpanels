@@ -1,0 +1,46 @@
+# Development files
+node_modules/
+.git/
+.gitignore
+*.log
+coverage/
+.nyc_output/
+.env*
+
+# TypeScript source (only include compiled dist/)
+src/cli/
+src/utils/
+tsconfig*.json
+
+# Development configs
+.eslintrc*
+.prettierrc*
+
+# Next.js files (not needed for CLI)
+.next/
+out/
+
+# Documentation (except README)
+docs/
+
+# Build artifacts
+*.tgz
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test files
+test/
+tests/
+__tests__/
+*.test.*
+*.spec.*
+
+# Example or demo projects
+examples/
+demo/

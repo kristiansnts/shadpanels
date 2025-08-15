@@ -1,147 +1,182 @@
 # ShadPanel
 
-A modern Next.js admin panel built with shadcn/ui, inspired by FilamentPHP. ShadPanel delivers a clean, accessible, and highly customizable foundation for admin interfaces—with first-class TypeScript support.
+A CLI tool for generating modern admin panels in Next.js projects using shadcn/ui components.
 
-![ShadPanel](./shadpanel.png)
+[![npm version](https://badge.fury.io/js/shadpanel.svg)](https://badge.fury.io/js/shadpanel)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## ✨ Features
 
-- **🎨 Modern UI**: Built with shadcn/ui components for a consistent, beautiful interface
-- **📱 Responsive**: Mobile-first design that works on all devices
-- **🧭 Smart Navigation**: Context-aware sidebar with collapsible support
-- **🔧 Modular Components**: Clean, reusable UI components built with Radix primitives
-- **🔒 Type Safe**: Full TypeScript support with strict type checking
-- **⚡ Fast Routing**: Next.js App Router with file-based routing
-- **🎯 Accessibility**: WCAG compliant components with proper ARIA support
-- **🛠️ Developer Experience**: Hot reload, ESLint, and modern build tools
-- **🔐 Authentication**: Built-in authentication system with login/logout functionality
+- **🎨 Modern UI**: Generates admin panels with shadcn/ui components
+- **📱 Responsive**: Mobile-first design that works on all devices  
+- **🔒 Authentication**: Built-in login/logout system with route protection
+- **⚡ Fast Setup**: One command to add admin panel to existing Next.js projects
+- **🛠️ Customizable**: Full control over generated components and styling
+- **🔧 TypeScript**: Complete TypeScript support with type safety
 
 ## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm, pnpm, or yarn
 
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/kristiansnts/shadpanel.git
-cd shadpanel
+# Use with npx (recommended)
+npx shadpanel init
 
-# Install dependencies
-npm install
-# or
-pnpm install
-
-# Start development server
-npm run dev
-# or
-pnpm dev
+# Or install globally
+npm install -g shadpanel
+shadpanel init
 ```
 
-Visit `http://localhost:3000` to see your admin panel in action.
+### Requirements
 
-## 🏗️ Project Structure
+- Node.js 18+
+- Next.js project with App Router
+- Existing Next.js project (create one with `npx create-next-app@latest`)
+
+### Usage
+
+```bash
+# Initialize admin panel in your Next.js project
+npx shadpanel init
+
+# With custom options
+npx shadpanel init --app-name "MyApp Admin" --force
+
+# Preview what will be generated (dry run)
+npx shadpanel init --dry-run --verbose
+```
+
+## 📋 Command Reference
+
+### `init`
+Initialize an admin panel in your Next.js project.
+
+```bash
+npx shadpanel init [options]
+```
+
+**Options:**
+- `--force` - Overwrite existing files without prompting
+- `--skip-deps` - Skip automatic dependency installation  
+- `--app-name <name>` - Set custom app name (default: "Admin Panel")
+- `--dry-run` - Preview changes without writing files
+- `--verbose` - Enable verbose logging
+- `--help` - Show help for command
+
+**Examples:**
+```bash
+# Basic setup
+npx shadpanel init
+
+# Custom configuration  
+npx shadpanel init --app-name "MyCompany Admin" --force
+
+# Preview changes
+npx shadpanel init --dry-run --verbose
+```
+
+## 📁 What Gets Generated
+
+ShadPanel generates a complete admin panel structure in your Next.js project:
 
 ```
-/
-├── app/                     # Next.js App Router
-│   ├── admin/              # Admin panel pages
-│   ├── api/                # API routes
-│   │   └── auth/           # Authentication endpoints
-│   ├── login/              # Login page
-│   └── globals.css         # Global styles
-├── components/             # Reusable components
-│   ├── ui/                 # shadcn/ui components
-│   ├── app-sidebar.tsx     # Main navigation sidebar
-│   ├── app-header.tsx      # Header component
-│   ├── login-form.tsx      # Login form component
-│   └── nav-*.tsx           # Navigation components
-├── hooks/                  # Custom React hooks
-├── lib/                    # Utilities and configurations
-├── types/                  # TypeScript type definitions
-└── middleware.ts           # Next.js middleware
+your-nextjs-project/
+├── app/
+│   ├── admin/                  # Admin panel routes
+│   │   ├── layout.tsx          # Admin layout with sidebar
+│   │   └── page.tsx            # Admin dashboard
+│   ├── login/                  # Authentication pages  
+│   │   ├── layout.tsx          # Login layout
+│   │   └── page.tsx            # Login page
+│   └── api/
+│       └── auth/               # Authentication API endpoints
+│           ├── login/route.ts  # Login endpoint
+│           ├── logout/route.ts # Logout endpoint
+│           └── status/route.ts # Auth status check
+├── components/
+│   ├── ui/                     # shadcn/ui components
+│   │   ├── avatar.tsx          # User avatar component
+│   │   ├── button.tsx          # Button component  
+│   │   ├── card.tsx            # Card component
+│   │   └── ...                 # Other UI components
+│   ├── app-header.tsx          # Header with user menu
+│   ├── app-sidebar.tsx         # Sidebar navigation
+│   └── login-form.tsx          # Login form component
+├── hooks/
+│   ├── use-auth.ts             # Authentication hook
+│   └── use-mobile.ts           # Mobile detection hook
+├── lib/
+│   ├── app-config.ts           # App configuration
+│   ├── auth.ts                 # Authentication utilities
+│   └── utils.ts                # Utility functions
+├── middleware.ts               # Route protection middleware
+├── next.config.ts              # Next.js config with rewrites
+└── components.json             # shadcn/ui configuration
 ```
 
 ## 🎨 Built With
 
-- **React 19** - Latest React with modern features
-- **Next.js 15** - Full-stack React framework with App Router
+Generated admin panels include:
+
+- **React 19** - Modern React features
+- **Next.js 15** - App Router with file-based routing  
 - **TypeScript** - Type-safe development
-- **shadcn/ui** - High-quality, accessible UI components
-- **Tailwind CSS 4** - Latest utility-first CSS framework
-- **Radix UI** - Low-level accessible UI primitives
-- **Lucide React** - Beautiful, customizable icons
-- **Class Variance Authority** - Type-safe component variants
+- **shadcn/ui** - High-quality accessible components
+- **Tailwind CSS** - Utility-first styling
+- **Radix UI** - Accessible primitives
+- **Lucide React** - Beautiful icons
 
-## 📊 Features Overview
+## ⚙️ Configuration
 
-### Authentication
-- Secure login/logout system
-- Session management with middleware
-- Protected routes and API endpoints
-- User authentication hooks
+### Environment Variables
 
-### Navigation
-- Collapsible sidebar navigation
-- User profile dropdown
-- Active state management
-- Mobile-friendly responsive design
+Set these in your `.env.local` file:
 
-### Admin Panel
-- Clean admin interface
-- Customizable dashboard
-- Component-based architecture
-- Type-safe navigation configuration
+```env
+# App branding
+NEXT_PUBLIC_APP_NAME="Your App Name"
+NEXT_PUBLIC_DASHBOARD_TITLE="Custom Dashboard Title"
 
-## 🛠️ Development
-
-### Available Scripts
-
-```bash
-# Start development server with Turbopack
-npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm run start
-
-# Run ESLint
-npm run lint
+# Authentication (optional)
+AUTH_SECRET="your-secret-key"
 ```
 
 ### Customization
 
-ShadPanel is designed to be highly customizable:
+All generated files are fully customizable:
 
-1. **App Config**: Modify app name and settings in `lib/app-config.ts`
-2. **Components**: All shadcn/ui components can be customized in `components/ui/`
-3. **Layout**: Modify sidebar and header components for your brand
-4. **Routing**: Add new routes in the `app/` directory (Next.js App Router)
-5. **Styling**: Update Tailwind CSS configuration and global styles
+1. **App Config**: Modify `lib/app-config.ts` for branding
+2. **Components**: Customize `components/ui/` and layout components  
+3. **Navigation**: Update sidebar navigation in `components/app-sidebar.tsx`
+4. **Authentication**: Modify `lib/auth.ts` for custom auth logic
+5. **Styling**: Update Tailwind config and component styles
 
-## 📱 FilamentPHP Inspiration
+## 🔧 Development
 
-ShadPanel takes inspiration from FilamentPHP's excellent admin panel design:
+After generating your admin panel:
 
-- **Clean, minimal interface** with focus on content
-- **Consistent component patterns** across the application
-- **Logical information hierarchy** for better user experience
-- **Responsive design** that works on all devices
-- **Accessible by default** with proper ARIA support
+```bash
+# Start development server
+npm run dev
+
+# Visit your admin panel
+open http://localhost:3000/admin
+```
+
+### Authentication
+
+Default login credentials (customize in `lib/auth.ts`):
+- Username: `admin`  
+- Password: `password`
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guide](https://github.com/yourusername/shadpanel/blob/main/CONTRIBUTING.md).
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+4. Push to the branch (`git push origin feature/amazing-feature`)  
 5. Open a Pull Request
 
 ## 📄 License
@@ -151,15 +186,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - [shadcn/ui](https://ui.shadcn.com/) for the amazing component library
-- [FilamentPHP](https://filamentphp.com/) for design inspiration
-- [TanStack](https://tanstack.com/) for excellent developer tools
-- [Radix UI](https://radix-ui.com/) for accessible primitives
-
-## 📞 Support
-
-- 📧 Email: epafroditus.kristian@gmail.com
-- 🐛 Issues: [GitHub Issues](https://github.com/kristiansnts/shadpanel/issues)
+- [Next.js](https://nextjs.org/) for the fantastic React framework
+- [Radix UI](https://radix-ui.com/) for accessible primitives  
+- [Tailwind CSS](https://tailwindcss.com/) for utility-first styling
 
 ---
 
-<p align="center">Made with ❤️ by the ShadPanel team</p>
+<p align="center">Made with ❤️ for building simple admin panels</p>
