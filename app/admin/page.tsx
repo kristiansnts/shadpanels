@@ -64,7 +64,7 @@ export default function AdminPage() {
                   <AvatarFallback className="rounded-full">KE</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="text-lg font-semibold">Selamat Datang</h2>
+                  <h2 className="text-lg font-semibold">Welcome</h2>
                 <p className="text-sm text-muted-foreground">{user.name}</p>
               </div>
             </div>
