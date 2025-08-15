@@ -1,6 +1,6 @@
 # ShadPanel
 
-A modern React admin panel built with shadcn/ui components and Next.js, inspired by the elegant design patterns of FilamentPHP. ShadPanel provides a clean, accessible, and highly customizable foundation for building admin interfaces with TypeScript support.
+A modern Next.js admin panel built with shadcn/ui, inspired by FilamentPHP. ShadPanel delivers a clean, accessible, and highly customizable foundation for admin interfaces—with first-class TypeScript support.
 
 ![ShadPanel](./shadpanel.png)
 
