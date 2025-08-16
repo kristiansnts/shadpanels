@@ -8,34 +8,41 @@ import * as path from 'path';
 export async function generateAdminPanel(projectInfo: ProjectInfo, options: InitOptions) {
   logger.debug('Generating admin panel...');
 
-  if (projectInfo.hasExistingAdmin && !options.force) {
-    logger.warn('Existing admin routes detected. Use --force to overwrite.');
+  // Check if shadcn/ui is already set up
+  if (!projectInfo.hasShadcnUi) {
+    logger.info('🚀 Welcome to shadpanel! To get started, you need to install shadcn/ui first.');
+    logger.info('');
+    logger.info('Please run the following commands in order:');
+    logger.info('');
+    logger.info('1. Initialize shadcn/ui:');
+    logger.info('   pnpm dlx shadcn@latest init');
+    logger.info('');
+    logger.info('2. Add required sidebar component:');
+    logger.info('   npx shadcn@latest add sidebar-08');
+    logger.info('');
+    logger.info('3. Add required login component:');
+    logger.info('   npx shadcn@latest add login-02');
+    logger.info('');
+    logger.info('4. After installing these components, run shadpanel init again:');
+    logger.info('   npx shadpanel init');
+    logger.info('');
+    logger.warn('⚠️  Please complete the above steps before proceeding.');
     return;
   }
 
-  // Check for shadcn/ui setup
-  if (!projectInfo.hasShadcnUi) {
-    logger.warn('⚠️  shadcn/ui not detected. The generated components will require shadcn/ui.');
-    logger.info('To set up shadcn/ui, run:');
-    logger.info('  npx shadcn@latest init');
-    logger.info('Then install the required components:');
-    logger.info('  npx shadcn@latest add card button input label sidebar breadcrumb separator');
-    logger.info('');
+  // Check for Tailwind CSS (should be installed by shadcn init)
+  if (!projectInfo.hasTailwind) {
+    logger.warn('⚠️  Tailwind CSS not detected. This should have been installed by shadcn/ui.');
+    logger.info('Please run: pnpm dlx shadcn@latest init');
     
     if (!options.force) {
-      logger.warn('Use --force to generate components anyway.');
       return;
     }
   }
 
-  // Check for Tailwind CSS
-  if (!projectInfo.hasTailwind) {
-    logger.warn('⚠️  Tailwind CSS not detected. shadcn/ui requires Tailwind CSS.');
-    logger.info('Install Tailwind CSS first: https://tailwindcss.com/docs/guides/nextjs');
-    
-    if (!options.force) {
-      return;
-    }
+  // Note: We always generate/overwrite files to act as a template generator
+  if (projectInfo.hasExistingAdmin && !options.force) {
+    logger.info('⚠️  Existing admin routes detected. Files will be overwritten.');
   }
 
   const variables = getDefaultVariables(options.appName || 'Admin Panel');
@@ -74,7 +81,7 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
     options
   );
 
-  // Generate app-sidebar component
+  // Generate sidebar components
   await generateFile(
     joinPath(templatesDir, 'components/app-sidebar.tsx'),
     joinPath(projectRoot, 'components/app-sidebar.tsx'),
@@ -82,17 +89,87 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
     options
   );
 
+  await generateFile(
+    joinPath(templatesDir, 'components/nav-main.tsx'),
+    joinPath(projectRoot, 'components/nav-main.tsx'),
+    variables,
+    options
+  );
+
+  await generateFile(
+    joinPath(templatesDir, 'components/nav-projects.tsx'),
+    joinPath(projectRoot, 'components/nav-projects.tsx'),
+    variables,
+    options
+  );
+
+  await generateFile(
+    joinPath(templatesDir, 'components/nav-user.tsx'),
+    joinPath(projectRoot, 'components/nav-user.tsx'),
+    variables,
+    options
+  );
+
+  await generateFile(
+    joinPath(templatesDir, 'components/team-switcher.tsx'),
+    joinPath(projectRoot, 'components/team-switcher.tsx'),
+    variables,
+    options
+  );
+
+  // Note: UI components are now provided by shadcn/ui installation
+  // No need to generate UI components manually
+
+  // Note: lib/utils.ts is provided by shadcn/ui installation
+
+  await generateFile(
+    joinPath(templatesDir, 'lib/app-config.ts'),
+    joinPath(projectRoot, 'lib/app-config.ts'),
+    variables,
+    options
+  );
+
+  await generateFile(
+    joinPath(templatesDir, 'lib/icons.ts'),
+    joinPath(projectRoot, 'lib/icons.ts'),
+    variables,
+    options
+  );
+
+  // Generate types
+  await generateFile(
+    joinPath(templatesDir, 'types/navigation.ts'),
+    joinPath(projectRoot, 'types/navigation.ts'),
+    variables,
+    options
+  );
+
+  // Generate additional components
+  await generateFile(
+    joinPath(templatesDir, 'components/login-form.tsx'),
+    joinPath(projectRoot, 'components/login-form.tsx'),
+    variables,
+    options
+  );
+
+  // Generate hooks
+  await generateFile(
+    joinPath(templatesDir, 'hooks/use-mobile.tsx'),
+    joinPath(projectRoot, 'hooks/use-mobile.tsx'),
+    variables,
+    options
+  );
+
   logger.success('Admin panel files generated successfully');
-  
-  if (projectInfo.hasShadcnUi) {
-    logger.info('✅ shadcn/ui detected - components should work out of the box');
-  } else {
-    logger.info('');
-    logger.info('Next steps:');
-    logger.info('1. Set up shadcn/ui: npx shadcn@latest init');
-    logger.info('2. Install components: npx shadcn@latest add card button input label sidebar breadcrumb separator');
-    logger.info('3. Add the missing nav components (nav-main, nav-projects, nav-user, team-switcher)');
-  }
+  logger.info('');
+  logger.info('✅ Your admin panel is ready to use!');
+  logger.info('✅ Using shadcn/ui components with custom templates');
+  logger.info('');
+  logger.info('Available routes:');
+  logger.info('• /admin - Dashboard page');
+  logger.info('• /login - Login page');
+  logger.info('');
+  logger.info('Start your development server to see the admin panel in action!')
 }
 
 async function generateFile(
@@ -110,11 +187,13 @@ async function generateFile(
     const templateContent = await readFile(templatePath);
     const processedContent = processTemplate(templateContent, variables);
     
-    const written = await writeFile(destinationPath, processedContent, options.force);
+    // Always overwrite files in template generation mode (default behavior)
+    const forceOverwrite = options.force ?? true;
+    const written = await writeFile(destinationPath, processedContent, forceOverwrite);
     
     if (written) {
       logger.success(`Generated: ${destinationPath}`);
-    } else if (!options.force) {
+    } else {
       logger.warn(`Skipped existing file: ${destinationPath}`);
     }
   } catch (error) {

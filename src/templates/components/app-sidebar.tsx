@@ -1,155 +1,72 @@
 "use client"
 
 import * as React from "react"
-import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react"
+import { GalleryVerticalEnd } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { getAppName } from "@/lib/app-config"
+import { getIconComponent } from "@/lib/icons"
+import { NavigationConfig } from "@/types/navigation"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "Admin User",
-    email: "admin@example.com",
-    avatar: "/avatars/admin.jpg",
-  },
-  teams: [
-    {
-      name: "{{APP_NAME}}",
-      logo: GalleryVerticalEnd,
-      plan: "Admin",
-    },
-  ],
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/admin",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "Overview",
-          url: "/admin",
-        },
-        {
-          title: "Analytics",
-          url: "/admin/analytics",
-        },
-        {
-          title: "Reports",
-          url: "/admin/reports",
-        },
-      ],
-    },
-    {
-      title: "Users",
-      url: "/admin/users",
-      icon: Bot,
-      items: [
-        {
-          title: "All Users",
-          url: "/admin/users",
-        },
-        {
-          title: "Add User",
-          url: "/admin/users/new",
-        },
-        {
-          title: "User Roles",
-          url: "/admin/users/roles",
-        },
-      ],
-    },
-    {
-      title: "Content",
-      url: "/admin/content",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Posts",
-          url: "/admin/content/posts",
-        },
-        {
-          title: "Pages",
-          url: "/admin/content/pages",
-        },
-        {
-          title: "Media",
-          url: "/admin/content/media",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "/admin/settings",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "/admin/settings",
-        },
-        {
-          title: "Security",
-          url: "/admin/settings/security",
-        },
-        {
-          title: "Integrations",
-          url: "/admin/settings/integrations",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Website",
-      url: "/admin/projects/website",
-      icon: Frame,
-    },
-    {
-      name: "Analytics",
-      url: "/admin/projects/analytics",
-      icon: PieChart,
-    },
-    {
-      name: "Documentation",
-      url: "/admin/projects/docs",
-      icon: Map,
-    },
-  ],
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  navigation?: NavigationConfig
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ navigation, ...props }: AppSidebarProps) {
+  const brand = {
+    name: getAppName(),
+    logo: GalleryVerticalEnd,
+  }
+
+  // Default user if none provided
+  const defaultUser = {
+    name: "shadcn",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
+  }
+
+  // Convert string icons to components for NavMain
+  const navGroupsWithIcons = navigation?.navGroups?.map((group) => ({
+    ...group,
+    icon: getIconComponent(group.icon),
+  }))
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+              <a href="/admin">
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <brand.logo className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">{brand.name}</span>
+                </div>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        {navGroupsWithIcons && (
+          <NavMain items={navGroupsWithIcons} />
+        )}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={navigation?.user || defaultUser} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
