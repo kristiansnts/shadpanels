@@ -1,6 +1,6 @@
 {
   "name": "shadpanel",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "CLI tool for generating modern admin panels in Next.js projects using shadcn/ui components",
   "private": false,
   "bin": {
