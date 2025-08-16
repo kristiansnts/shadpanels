@@ -31,12 +31,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/shadpanel.git"
+    "url": "https://github.com/kristiansnts/shadpanels.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/shadpanel/issues"
+    "url": "https://github.com/kristiansnts/shadpanels/issues"
   },
-  "homepage": "https://github.com/yourusername/shadpanel#readme",
+  "homepage": "https://github.com/kristiansnts/shadpanels#readme",
   "dependencies": {
     "commander": "^14.0.0"
   },

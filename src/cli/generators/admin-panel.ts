@@ -14,7 +14,7 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
   }
 
   const variables = getDefaultVariables(options.appName || 'Admin Panel');
-  const templatesDir = path.join(__dirname, '../../templates');
+  const templatesDir = path.join(__dirname, '../../../src/templates');
   const projectRoot = projectInfo.rootPath;
 
   // Generate admin layout

@@ -45,7 +45,7 @@ async function generateAdminPanel(projectInfo, options) {
         return;
     }
     const variables = (0, template_processor_1.getDefaultVariables)(options.appName || 'Admin Panel');
-    const templatesDir = path.join(__dirname, '../../templates');
+    const templatesDir = path.join(__dirname, '../../../src/templates');
     const projectRoot = projectInfo.rootPath;
     // Generate admin layout
     await generateFile((0, fs_1.joinPath)(templatesDir, 'app/admin/layout.tsx'), (0, fs_1.joinPath)(projectRoot, 'app/admin/layout.tsx'), variables, options);
