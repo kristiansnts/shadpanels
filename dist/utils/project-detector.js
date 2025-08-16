@@ -11,6 +11,8 @@ async function detectProject(rootPath) {
         hasAppRouter: false,
         hasPages: false,
         hasExistingAdmin: false,
+        hasShadcnUi: false,
+        hasTailwind: false,
         rootPath,
     };
     // Check for Next.js project
@@ -24,12 +26,32 @@ async function detectProject(rootPath) {
             const hasNextDep = projectInfo.packageJson.dependencies?.next ||
                 projectInfo.packageJson.devDependencies?.next;
             projectInfo.isNextJs = (nextConfigJs || nextConfigTs) && !!hasNextDep;
+            // Check for Tailwind CSS
+            const hasTailwindDep = projectInfo.packageJson.dependencies?.tailwindcss ||
+                projectInfo.packageJson.devDependencies?.tailwindcss;
+            projectInfo.hasTailwind = !!hasTailwindDep;
             if (projectInfo.isNextJs) {
                 logger_1.logger.debug('Detected Next.js project');
+            }
+            if (projectInfo.hasTailwind) {
+                logger_1.logger.debug('Detected Tailwind CSS');
             }
         }
         catch (error) {
             logger_1.logger.debug('Failed to parse package.json:', error);
+        }
+    }
+    // Check for shadcn/ui setup
+    const componentsJsonPath = (0, fs_2.joinPath)(rootPath, 'components.json');
+    if (await (0, fs_1.fileExists)(componentsJsonPath)) {
+        try {
+            const componentsJsonContent = await (0, fs_1.readFile)(componentsJsonPath);
+            projectInfo.componentsJson = JSON.parse(componentsJsonContent);
+            projectInfo.hasShadcnUi = true;
+            logger_1.logger.debug('Detected shadcn/ui setup');
+        }
+        catch (error) {
+            logger_1.logger.debug('Failed to parse components.json:', error);
         }
     }
     if (!projectInfo.isNextJs) {

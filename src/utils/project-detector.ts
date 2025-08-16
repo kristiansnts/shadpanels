@@ -7,8 +7,11 @@ export interface ProjectInfo {
   hasAppRouter: boolean;
   hasPages: boolean;
   hasExistingAdmin: boolean;
+  hasShadcnUi: boolean;
+  hasTailwind: boolean;
   rootPath: string;
   packageJson?: any;
+  componentsJson?: any;
 }
 
 export async function detectProject(rootPath: string): Promise<ProjectInfo> {
@@ -19,6 +22,8 @@ export async function detectProject(rootPath: string): Promise<ProjectInfo> {
     hasAppRouter: false,
     hasPages: false,
     hasExistingAdmin: false,
+    hasShadcnUi: false,
+    hasTailwind: false,
     rootPath,
   };
 
@@ -37,11 +42,32 @@ export async function detectProject(rootPath: string): Promise<ProjectInfo> {
       
       projectInfo.isNextJs = (nextConfigJs || nextConfigTs) && !!hasNextDep;
       
+      // Check for Tailwind CSS
+      const hasTailwindDep = projectInfo.packageJson.dependencies?.tailwindcss ||
+                            projectInfo.packageJson.devDependencies?.tailwindcss;
+      projectInfo.hasTailwind = !!hasTailwindDep;
+      
       if (projectInfo.isNextJs) {
         logger.debug('Detected Next.js project');
       }
+      if (projectInfo.hasTailwind) {
+        logger.debug('Detected Tailwind CSS');
+      }
     } catch (error) {
       logger.debug('Failed to parse package.json:', error);
+    }
+  }
+
+  // Check for shadcn/ui setup
+  const componentsJsonPath = joinPath(rootPath, 'components.json');
+  if (await fileExists(componentsJsonPath)) {
+    try {
+      const componentsJsonContent = await readFile(componentsJsonPath);
+      projectInfo.componentsJson = JSON.parse(componentsJsonContent);
+      projectInfo.hasShadcnUi = true;
+      logger.debug('Detected shadcn/ui setup');
+    } catch (error) {
+      logger.debug('Failed to parse components.json:', error);
     }
   }
 

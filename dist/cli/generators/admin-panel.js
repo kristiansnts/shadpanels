@@ -44,6 +44,27 @@ async function generateAdminPanel(projectInfo, options) {
         logger_1.logger.warn('Existing admin routes detected. Use --force to overwrite.');
         return;
     }
+    // Check for shadcn/ui setup
+    if (!projectInfo.hasShadcnUi) {
+        logger_1.logger.warn('⚠️  shadcn/ui not detected. The generated components will require shadcn/ui.');
+        logger_1.logger.info('To set up shadcn/ui, run:');
+        logger_1.logger.info('  npx shadcn@latest init');
+        logger_1.logger.info('Then install the required components:');
+        logger_1.logger.info('  npx shadcn@latest add card button input label sidebar breadcrumb separator');
+        logger_1.logger.info('');
+        if (!options.force) {
+            logger_1.logger.warn('Use --force to generate components anyway.');
+            return;
+        }
+    }
+    // Check for Tailwind CSS
+    if (!projectInfo.hasTailwind) {
+        logger_1.logger.warn('⚠️  Tailwind CSS not detected. shadcn/ui requires Tailwind CSS.');
+        logger_1.logger.info('Install Tailwind CSS first: https://tailwindcss.com/docs/guides/nextjs');
+        if (!options.force) {
+            return;
+        }
+    }
     const variables = (0, template_processor_1.getDefaultVariables)(options.appName || 'Admin Panel');
     const templatesDir = path.join(__dirname, '../../../src/templates');
     const projectRoot = projectInfo.rootPath;
@@ -55,7 +76,19 @@ async function generateAdminPanel(projectInfo, options) {
     await generateFile((0, fs_1.joinPath)(templatesDir, 'app/login/layout.tsx'), (0, fs_1.joinPath)(projectRoot, 'app/login/layout.tsx'), variables, options);
     // Generate login page
     await generateFile((0, fs_1.joinPath)(templatesDir, 'app/login/page.tsx'), (0, fs_1.joinPath)(projectRoot, 'app/login/page.tsx'), variables, options);
+    // Generate app-sidebar component
+    await generateFile((0, fs_1.joinPath)(templatesDir, 'components/app-sidebar.tsx'), (0, fs_1.joinPath)(projectRoot, 'components/app-sidebar.tsx'), variables, options);
     logger_1.logger.success('Admin panel files generated successfully');
+    if (projectInfo.hasShadcnUi) {
+        logger_1.logger.info('✅ shadcn/ui detected - components should work out of the box');
+    }
+    else {
+        logger_1.logger.info('');
+        logger_1.logger.info('Next steps:');
+        logger_1.logger.info('1. Set up shadcn/ui: npx shadcn@latest init');
+        logger_1.logger.info('2. Install components: npx shadcn@latest add card button input label sidebar breadcrumb separator');
+        logger_1.logger.info('3. Add the missing nav components (nav-main, nav-projects, nav-user, team-switcher)');
+    }
 }
 async function generateFile(templatePath, destinationPath, variables, options) {
     try {

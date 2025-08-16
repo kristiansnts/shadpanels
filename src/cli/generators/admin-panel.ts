@@ -13,6 +13,31 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
     return;
   }
 
+  // Check for shadcn/ui setup
+  if (!projectInfo.hasShadcnUi) {
+    logger.warn('⚠️  shadcn/ui not detected. The generated components will require shadcn/ui.');
+    logger.info('To set up shadcn/ui, run:');
+    logger.info('  npx shadcn@latest init');
+    logger.info('Then install the required components:');
+    logger.info('  npx shadcn@latest add card button input label sidebar breadcrumb separator');
+    logger.info('');
+    
+    if (!options.force) {
+      logger.warn('Use --force to generate components anyway.');
+      return;
+    }
+  }
+
+  // Check for Tailwind CSS
+  if (!projectInfo.hasTailwind) {
+    logger.warn('⚠️  Tailwind CSS not detected. shadcn/ui requires Tailwind CSS.');
+    logger.info('Install Tailwind CSS first: https://tailwindcss.com/docs/guides/nextjs');
+    
+    if (!options.force) {
+      return;
+    }
+  }
+
   const variables = getDefaultVariables(options.appName || 'Admin Panel');
   const templatesDir = path.join(__dirname, '../../../src/templates');
   const projectRoot = projectInfo.rootPath;
@@ -49,7 +74,25 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
     options
   );
 
+  // Generate app-sidebar component
+  await generateFile(
+    joinPath(templatesDir, 'components/app-sidebar.tsx'),
+    joinPath(projectRoot, 'components/app-sidebar.tsx'),
+    variables,
+    options
+  );
+
   logger.success('Admin panel files generated successfully');
+  
+  if (projectInfo.hasShadcnUi) {
+    logger.info('✅ shadcn/ui detected - components should work out of the box');
+  } else {
+    logger.info('');
+    logger.info('Next steps:');
+    logger.info('1. Set up shadcn/ui: npx shadcn@latest init');
+    logger.info('2. Install components: npx shadcn@latest add card button input label sidebar breadcrumb separator');
+    logger.info('3. Add the missing nav components (nav-main, nav-projects, nav-user, team-switcher)');
+  }
 }
 
 async function generateFile(
