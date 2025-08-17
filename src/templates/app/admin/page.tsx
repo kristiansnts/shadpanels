@@ -31,7 +31,7 @@ export default function AdminPage() {
 
   // User data - you can get this from context/props/API
   const user = {
-    name: "kristian epafroditus",
+    name: "Shadpanel User",
     avatar: "",
   }
 

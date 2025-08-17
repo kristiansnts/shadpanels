@@ -8,11 +8,12 @@ coverage/
 .nyc_output/
 .env*
 tsconfig*.json
-src/cli/       # Don't include TypeScript CLI source (only dist/)
-src/utils/     # Don't include TypeScript utils source (only dist/)
-# Keep src/templates/ for the CLI to use
-app/           # Don't include Next.js app
-components/    # Don't include Next.js components
+src/cli/       # Exclude TypeScript source (compiled JS is in dist/)
+src/utils/     # Exclude TypeScript source (compiled JS is in dist/)
+# Keep src/templates/ - needed for file generation
+# Keep dist/ - compiled CLI code (automatically included)
+app/           # Exclude Next.js test app
+components/    # Exclude Next.js test components  
 hooks/
 lib/
 types/
