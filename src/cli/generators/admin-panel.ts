@@ -1,12 +1,25 @@
 import { ProjectInfo } from '../../utils/project-detector';
 import { InitOptions } from '../commands/init';
 import { logger } from '../../utils/logger';
-import { writeFile, readFile, joinPath } from '../../utils/fs';
+import { writeFile, readFile, joinPath, copyFile } from '../../utils/fs';
 import { processTemplate, getDefaultVariables, TemplateVariables } from '../../utils/template-processor';
 import * as path from 'path';
 
 export async function generateAdminPanel(projectInfo: ProjectInfo, options: InitOptions) {
   logger.debug('Generating admin panel...');
+
+  // Determine directory structure based on project configuration
+  // If using src/app, everything goes in src/ (including app)
+  // If using root app/, everything goes in root beside app/
+  const usesSrcStructure = projectInfo.hasSrcApp;
+  
+  const appDir = usesSrcStructure ? 'src/app' : 'app';
+  const componentsDir = usesSrcStructure ? 'src/components' : 'components';
+  const libDir = usesSrcStructure ? 'src/lib' : 'lib';
+  const hooksDir = usesSrcStructure ? 'src/hooks' : 'hooks';
+  const typesDir = usesSrcStructure ? 'src/types' : 'types';
+  
+  logger.debug(`Using directory structure: app=${appDir}, components=${componentsDir}, lib=${libDir}`);
 
   // Check if shadcn/ui is already set up
   if (!projectInfo.hasShadcnUi) {
@@ -52,7 +65,7 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
   // Generate admin layout
   await generateFile(
     joinPath(templatesDir, 'app/admin/layout.tsx'),
-    joinPath(projectRoot, 'app/admin/layout.tsx'),
+    joinPath(projectRoot, appDir, 'admin/layout.tsx'),
     variables,
     options
   );
@@ -60,7 +73,29 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
   // Generate admin dashboard
   await generateFile(
     joinPath(templatesDir, 'app/admin/page.tsx'),
-    joinPath(projectRoot, 'app/admin/page.tsx'),
+    joinPath(projectRoot, appDir, 'admin/page.tsx'),
+    variables,
+    options
+  );
+
+  // Generate API auth routes
+  await generateFile(
+    joinPath(templatesDir, 'app/api/auth/login/route.ts'),
+    joinPath(projectRoot, appDir, 'api/auth/login/route.ts'),
+    variables,
+    options
+  );
+
+  await generateFile(
+    joinPath(templatesDir, 'app/api/auth/logout/route.ts'),
+    joinPath(projectRoot, appDir, 'api/auth/logout/route.ts'),
+    variables,
+    options
+  );
+
+  await generateFile(
+    joinPath(templatesDir, 'app/api/auth/status/route.ts'),
+    joinPath(projectRoot, appDir, 'api/auth/status/route.ts'),
     variables,
     options
   );
@@ -68,7 +103,7 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
   // Generate login layout
   await generateFile(
     joinPath(templatesDir, 'app/login/layout.tsx'),
-    joinPath(projectRoot, 'app/login/layout.tsx'),
+    joinPath(projectRoot, appDir, 'login/layout.tsx'),
     variables,
     options
   );
@@ -76,7 +111,7 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
   // Generate login page
   await generateFile(
     joinPath(templatesDir, 'app/login/page.tsx'),
-    joinPath(projectRoot, 'app/login/page.tsx'),
+    joinPath(projectRoot, appDir, 'login/page.tsx'),
     variables,
     options
   );
@@ -84,35 +119,35 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
   // Generate sidebar components
   await generateFile(
     joinPath(templatesDir, 'components/app-sidebar.tsx'),
-    joinPath(projectRoot, 'components/app-sidebar.tsx'),
+    joinPath(projectRoot, componentsDir, 'app-sidebar.tsx'),
     variables,
     options
   );
 
   await generateFile(
     joinPath(templatesDir, 'components/nav-main.tsx'),
-    joinPath(projectRoot, 'components/nav-main.tsx'),
+    joinPath(projectRoot, componentsDir, 'nav-main.tsx'),
     variables,
     options
   );
 
   await generateFile(
     joinPath(templatesDir, 'components/nav-projects.tsx'),
-    joinPath(projectRoot, 'components/nav-projects.tsx'),
+    joinPath(projectRoot, componentsDir, 'nav-projects.tsx'),
     variables,
     options
   );
 
   await generateFile(
     joinPath(templatesDir, 'components/nav-user.tsx'),
-    joinPath(projectRoot, 'components/nav-user.tsx'),
+    joinPath(projectRoot, componentsDir, 'nav-user.tsx'),
     variables,
     options
   );
 
   await generateFile(
     joinPath(templatesDir, 'components/team-switcher.tsx'),
-    joinPath(projectRoot, 'components/team-switcher.tsx'),
+    joinPath(projectRoot, componentsDir, 'team-switcher.tsx'),
     variables,
     options
   );
@@ -124,14 +159,21 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
 
   await generateFile(
     joinPath(templatesDir, 'lib/app-config.ts'),
-    joinPath(projectRoot, 'lib/app-config.ts'),
+    joinPath(projectRoot, libDir, 'app-config.ts'),
     variables,
     options
   );
 
   await generateFile(
     joinPath(templatesDir, 'lib/icons.ts'),
-    joinPath(projectRoot, 'lib/icons.ts'),
+    joinPath(projectRoot, libDir, 'icons.ts'),
+    variables,
+    options
+  );
+
+  await generateFile(
+    joinPath(templatesDir, 'lib/auth.ts'),
+    joinPath(projectRoot, libDir, 'auth.ts'),
     variables,
     options
   );
@@ -139,7 +181,7 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
   // Generate types
   await generateFile(
     joinPath(templatesDir, 'types/navigation.ts'),
-    joinPath(projectRoot, 'types/navigation.ts'),
+    joinPath(projectRoot, typesDir, 'navigation.ts'),
     variables,
     options
   );
@@ -147,7 +189,7 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
   // Generate additional components
   await generateFile(
     joinPath(templatesDir, 'components/login-form.tsx'),
-    joinPath(projectRoot, 'components/login-form.tsx'),
+    joinPath(projectRoot, componentsDir, 'login-form.tsx'),
     variables,
     options
   );
@@ -155,9 +197,40 @@ export async function generateAdminPanel(projectInfo: ProjectInfo, options: Init
   // Generate hooks
   await generateFile(
     joinPath(templatesDir, 'hooks/use-mobile.tsx'),
-    joinPath(projectRoot, 'hooks/use-mobile.tsx'),
+    joinPath(projectRoot, hooksDir, 'use-mobile.tsx'),
     variables,
     options
+  );
+
+  await generateFile(
+    joinPath(templatesDir, 'hooks/use-auth.ts'),
+    joinPath(projectRoot, hooksDir, 'use-auth.ts'),
+    variables,
+    options
+  );
+
+  // Generate middleware (in src/ if using src structure, otherwise at root)
+  const middlewarePath = usesSrcStructure ? 'src/middleware.ts' : 'middleware.ts';
+  await generateFile(
+    joinPath(templatesDir, 'middleware.ts'),
+    joinPath(projectRoot, middlewarePath),
+    variables,
+    options
+  );
+
+  // Generate next.config.ts (always at root level)
+  await generateFile(
+    joinPath(templatesDir, 'next.config.ts'),
+    joinPath(projectRoot, 'next.config.ts'),
+    variables,
+    options
+  );
+
+  // Generate public assets
+  await copyFile(
+    joinPath(templatesDir, 'public/placeholder.svg'),
+    joinPath(projectRoot, 'public/placeholder.svg'),
+    options.force ?? true
   );
 
   logger.success('Admin panel files generated successfully');

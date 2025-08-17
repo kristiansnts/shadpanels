@@ -33,7 +33,7 @@ export function AppSidebar({ navigation, ...props }: AppSidebarProps) {
   const defaultUser = {
     name: "shadcn",
     email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "",
   }
 
   // Convert string icons to components for NavMain

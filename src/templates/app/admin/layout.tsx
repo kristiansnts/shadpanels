@@ -34,7 +34,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     user: {
       name: "shadcn",
       email: "shadpanel@admin.com",
-      avatar: "/avatars/shadcn.jpg",
+      avatar: "",
     }
   }
 

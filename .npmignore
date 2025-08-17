@@ -21,4 +21,4 @@ next.config.ts
 tailwind.config.*
 postcss.config.*
 .next/
-/next-testing
+/next-test

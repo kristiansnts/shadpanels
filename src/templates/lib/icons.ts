@@ -14,6 +14,7 @@ import {
   FileText,
   Calendar,
   Mail,
+  LayoutDashboard,
 } from "lucide-react"
 import { LucideIcon } from "lucide-react"
 
@@ -38,5 +39,5 @@ export const iconMap: Record<string, LucideIcon> = {
 
 // Helper function to get icon component from string
 export function getIconComponent(iconName: string): LucideIcon {
-  return iconMap[iconName] || SquareTerminal // fallback to SquareTerminal
+  return iconMap[iconName] || LayoutDashboard // fallback to SquareTerminal
 }

@@ -9,9 +9,20 @@ export interface ProjectInfo {
   hasExistingAdmin: boolean;
   hasShadcnUi: boolean;
   hasTailwind: boolean;
+  hasTypeScript: boolean;
+  hasEslint: boolean;
+  hasPathAlias: boolean;
+  hasSrcFolder: boolean;
+  hasSrcApp: boolean;
+  hasSrcPages: boolean;
+  hasRootApp: boolean;
+  hasRootPages: boolean;
+  routerType: 'app' | 'pages' | 'mixed' | 'none';
+  appLocation: 'root' | 'src' | 'none';
   rootPath: string;
   packageJson?: any;
   componentsJson?: any;
+  tsConfigJson?: any;
 }
 
 export async function detectProject(rootPath: string): Promise<ProjectInfo> {
@@ -24,6 +35,16 @@ export async function detectProject(rootPath: string): Promise<ProjectInfo> {
     hasExistingAdmin: false,
     hasShadcnUi: false,
     hasTailwind: false,
+    hasTypeScript: false,
+    hasEslint: false,
+    hasPathAlias: false,
+    hasSrcFolder: false,
+    hasSrcApp: false,
+    hasSrcPages: false,
+    hasRootApp: false,
+    hasRootPages: false,
+    routerType: 'none',
+    appLocation: 'none',
     rootPath,
   };
 
@@ -47,11 +68,27 @@ export async function detectProject(rootPath: string): Promise<ProjectInfo> {
                             projectInfo.packageJson.devDependencies?.tailwindcss;
       projectInfo.hasTailwind = !!hasTailwindDep;
       
+      // Check for TypeScript
+      const hasTypeScriptDep = projectInfo.packageJson.dependencies?.typescript ||
+                              projectInfo.packageJson.devDependencies?.typescript;
+      projectInfo.hasTypeScript = !!hasTypeScriptDep;
+      
+      // Check for ESLint
+      const hasEslintDep = projectInfo.packageJson.dependencies?.eslint ||
+                          projectInfo.packageJson.devDependencies?.eslint;
+      projectInfo.hasEslint = !!hasEslintDep;
+      
       if (projectInfo.isNextJs) {
         logger.debug('Detected Next.js project');
       }
       if (projectInfo.hasTailwind) {
         logger.debug('Detected Tailwind CSS');
+      }
+      if (projectInfo.hasTypeScript) {
+        logger.debug('Detected TypeScript');
+      }
+      if (projectInfo.hasEslint) {
+        logger.debug('Detected ESLint');
       }
     } catch (error) {
       logger.debug('Failed to parse package.json:', error);
@@ -75,23 +112,71 @@ export async function detectProject(rootPath: string): Promise<ProjectInfo> {
     return projectInfo;
   }
 
-  // Check for App Router vs Pages Router
+  // Check for App Router vs Pages Router with specific locations
   const appDir = await directoryExists(joinPath(rootPath, 'app'));
+  const srcAppDir = await directoryExists(joinPath(rootPath, 'src', 'app'));
   const pagesDir = await directoryExists(joinPath(rootPath, 'pages'));
+  const srcPagesDir = await directoryExists(joinPath(rootPath, 'src', 'pages'));
   
-  projectInfo.hasAppRouter = appDir;
-  projectInfo.hasPages = pagesDir;
-
-  if (projectInfo.hasAppRouter) {
-    logger.debug('Detected App Router');
+  // Set specific location flags
+  projectInfo.hasRootApp = appDir;
+  projectInfo.hasSrcApp = srcAppDir;
+  projectInfo.hasRootPages = pagesDir;
+  projectInfo.hasSrcPages = srcPagesDir;
+  
+  // Set general flags for compatibility
+  projectInfo.hasAppRouter = appDir || srcAppDir;
+  projectInfo.hasPages = pagesDir || srcPagesDir;
+  
+  // Determine router type and app location
+  if (projectInfo.hasAppRouter && projectInfo.hasPages) {
+    projectInfo.routerType = 'mixed';
+  } else if (projectInfo.hasAppRouter) {
+    projectInfo.routerType = 'app';
   } else if (projectInfo.hasPages) {
-    logger.debug('Detected Pages Router');
+    projectInfo.routerType = 'pages';
+  } else {
+    projectInfo.routerType = 'none';
+  }
+  
+  // Determine app location
+  if (projectInfo.hasRootApp) {
+    projectInfo.appLocation = 'root';
+  } else if (projectInfo.hasSrcApp) {
+    projectInfo.appLocation = 'src';
+  } else {
+    projectInfo.appLocation = 'none';
+  }
+
+  // Enhanced logging
+  if (projectInfo.routerType === 'app') {
+    if (projectInfo.appLocation === 'src') {
+      logger.debug('Detected App Router in src/app');
+    } else {
+      logger.debug('Detected App Router in root app/');
+    }
+  } else if (projectInfo.routerType === 'pages') {
+    if (projectInfo.hasSrcPages) {
+      logger.debug('Detected Pages Router in src/pages');
+    } else {
+      logger.debug('Detected Pages Router in root pages/');
+    }
+  } else if (projectInfo.routerType === 'mixed') {
+    logger.debug('Detected mixed App and Pages Router setup');
   }
 
   // Check for existing admin routes
   if (projectInfo.hasAppRouter) {
-    const adminDir = await directoryExists(joinPath(rootPath, 'app', 'admin'));
-    const loginDir = await directoryExists(joinPath(rootPath, 'app', 'login'));
+    let adminDir, loginDir;
+    
+    if (projectInfo.hasSrcApp) {
+      adminDir = await directoryExists(joinPath(rootPath, 'src', 'app', 'admin'));
+      loginDir = await directoryExists(joinPath(rootPath, 'src', 'app', 'login'));
+    } else {
+      adminDir = await directoryExists(joinPath(rootPath, 'app', 'admin'));
+      loginDir = await directoryExists(joinPath(rootPath, 'app', 'login'));
+    }
+    
     projectInfo.hasExistingAdmin = adminDir || loginDir;
     
     if (projectInfo.hasExistingAdmin) {
@@ -106,6 +191,65 @@ export async function detectProject(rootPath: string): Promise<ProjectInfo> {
     const loginPage = await fileExists(joinPath(rootPath, 'pages', 'login.tsx')) ||
                      await fileExists(joinPath(rootPath, 'pages', 'login.js'));
     projectInfo.hasExistingAdmin = adminPage || loginPage;
+  }
+
+  // Check for src folder
+  projectInfo.hasSrcFolder = await directoryExists(joinPath(rootPath, 'src'));
+  
+  // Check for TypeScript/JavaScript config and path aliases
+  const tsConfigPath = joinPath(rootPath, 'tsconfig.json');
+  const jsConfigPath = joinPath(rootPath, 'jsconfig.json');
+  
+  if (await fileExists(tsConfigPath)) {
+    // Additional confirmation of TypeScript setup
+    projectInfo.hasTypeScript = true;
+    
+    try {
+      const tsConfigContent = await readFile(tsConfigPath);
+      projectInfo.tsConfigJson = JSON.parse(tsConfigContent);
+      
+      // Check for path aliases
+      const paths = projectInfo.tsConfigJson?.compilerOptions?.paths;
+      if (paths && paths['@/*']) {
+        projectInfo.hasPathAlias = true;
+        logger.debug('Detected TypeScript path aliases');
+      }
+    } catch (error) {
+      logger.debug('Failed to parse tsconfig.json:', error);
+    }
+  } else if (await fileExists(jsConfigPath)) {
+    try {
+      const jsConfigContent = await readFile(jsConfigPath);
+      projectInfo.tsConfigJson = JSON.parse(jsConfigContent);
+      
+      // Check for path aliases
+      const paths = projectInfo.tsConfigJson?.compilerOptions?.paths;
+      if (paths && paths['@/*']) {
+        projectInfo.hasPathAlias = true;
+        logger.debug('Detected JavaScript path aliases');
+      }
+    } catch (error) {
+      logger.debug('Failed to parse jsconfig.json:', error);
+    }
+  }
+  
+  // Check for ESLint config files
+  const eslintConfigs = [
+    '.eslintrc.js',
+    '.eslintrc.json', 
+    '.eslintrc.yaml',
+    '.eslintrc.yml',
+    'eslint.config.js',
+    'eslint.config.mjs',
+    'eslint.config.cjs'
+  ];
+  
+  for (const configFile of eslintConfigs) {
+    if (await fileExists(joinPath(rootPath, configFile))) {
+      projectInfo.hasEslint = true;
+      logger.debug(`Detected ESLint config: ${configFile}`);
+      break;
+    }
   }
 
   return projectInfo;

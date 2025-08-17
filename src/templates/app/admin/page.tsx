@@ -22,7 +22,7 @@ export default function AdminPage() {
       await fetch("/api/auth/logout", {
         method: "POST",
       })
-      router.push("/admin/login")
+      router.push("/login")
       router.refresh()
     } catch (error) {
       console.error("Logout error:", error)
@@ -32,7 +32,7 @@ export default function AdminPage() {
   // User data - you can get this from context/props/API
   const user = {
     name: "kristian epafroditus",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "",
   }
 
   return (
@@ -61,10 +61,10 @@ export default function AdminPage() {
               <div className="flex items-center gap-4">
                 <Avatar className="h-12 w-12 rounded-full">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-full">KE</AvatarFallback>
+                  <AvatarFallback className="rounded-full">CN</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="text-lg font-semibold">Selamat Datang</h2>
+                  <h2 className="text-lg font-semibold">Welcome</h2>
                 <p className="text-sm text-muted-foreground">{user.name}</p>
               </div>
             </div>
@@ -74,7 +74,7 @@ export default function AdminPage() {
               className="flex items-center gap-2"
             >
               <LogOut className="h-4 w-4" />
-              Keluar
+              Sign Out
             </Button>
           </div>
         </CardContent>

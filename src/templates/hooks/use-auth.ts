@@ -63,7 +63,7 @@ export function useAuth(): UseAuthReturn {
         method: 'POST',
       })
       setIsAuthenticated(false)
-      router.push('/admin/login')
+      router.push('/login')
       router.refresh()
     } catch (error) {
       console.error('Logout error:', error)
