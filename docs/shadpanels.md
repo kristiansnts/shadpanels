@@ -458,7 +458,7 @@ We welcome contributions to ShadPanel! Please see our contributing guidelines:
 
 ## Support
 
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/shadpanel/issues)
+- 🐛 Issues: [GitHub Issues](https://github.com/kristiansnts/shadpanels/issues)
 - 📖 Documentation: Coming soon
 
 ## License

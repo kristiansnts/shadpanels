@@ -38,12 +38,12 @@ Check that `package.json` is properly configured:
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/shadpanel.git"
+    "url": "https://github.com/kristiansnts/shadpanels.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/shadpanel/issues"
+    "url": "https://github.com/kristiansnts/shadpanels/issues"
   },
-  "homepage": "https://github.com/yourusername/shadpanel#readme"
+  "homepage": "https://github.com/kristiansnts/shadpanels#readme"
 }
 ```
 
@@ -226,7 +226,7 @@ npx shadpanel init
 4. **Package name taken** - Use scoped name or different name
 5. **Missing build** - Always run `npm run build:cli` before publishing
 
-## Automation (Future)
+## Automation (Future) 
 Consider setting up GitHub Actions for automated publishing:
 ```yaml
 # .github/workflows/publish.yml

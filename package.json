@@ -1,6 +1,6 @@
 {
   "name": "shadpanel",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "CLI tool for generating modern admin panels in Next.js projects using shadcn/ui components",
   "private": false,
   "bin": {
@@ -27,16 +27,16 @@
     "typescript",
     "tailwind"
   ],
-  "author": "Your Name",
+  "author": "Kristiansnts",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/shadpanel.git"
+    "url": "https://github.com/kristiansnts/shadpanels.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/shadpanel/issues"
+    "url": "https://github.com/kristiansnts/shadpanels/issues"
   },
-  "homepage": "https://github.com/yourusername/shadpanel#readme",
+  "homepage": "https://github.com/kristiansnts/shadpanels#readme",
   "dependencies": {
     "commander": "^14.0.0"
   },
